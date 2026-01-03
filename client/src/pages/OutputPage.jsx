@@ -158,7 +158,8 @@ export default function OutputPage() {
       setCurrentCard({
         headerText: data.headerText,
         bodyHtml: data.bodyHtml,
-        badgeNumber: data.badgeNumber
+        badgeNumber: data.badgeNumber,
+        hideHeader: data.hideHeader || false
       });
       setIsBlank(false);
       setTransitioning(false);
@@ -201,7 +202,9 @@ export default function OutputPage() {
             {currentCard.badgeNumber && (
               <div className="card-badge">{currentCard.badgeNumber}</div>
             )}
-            <div className="card-header">{currentCard.headerText}</div>
+            {!currentCard.hideHeader && (
+              <div className="card-header">{currentCard.headerText}</div>
+            )}
             <div
               className="card-body"
               dangerouslySetInnerHTML={{ __html: currentCard.bodyHtml }}

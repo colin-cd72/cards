@@ -58,6 +58,7 @@ const cardController = {
           headerText: card.header_text,
           bodyHtml: card.body_html,
           badgeNumber: card.badge_number,
+          hideHeader: req.validatedBody.hide_header || false,
           sentAt: card.sent_at,
           sentBy: card.sent_by
         });

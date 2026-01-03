@@ -34,6 +34,7 @@ export default function UserPage() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [presetNumber, setPresetNumber] = useState('');
   const [presetSubject, setPresetSubject] = useState('');
+  const [hideHeader, setHideHeader] = useState(false);
 
   const quillRef = useRef(null);
 
@@ -66,7 +67,8 @@ export default function UserPage() {
         body_content: bodyContent,
         body_html: bodyHtml,
         badge_number: badgeNumber || null,
-        preset_id: selectedPreset?.id || null
+        preset_id: selectedPreset?.id || null,
+        hide_header: hideHeader
       });
     } catch (error) {
       alert('Failed to send card: ' + (error.response?.data?.error || error.message));
@@ -293,6 +295,14 @@ export default function UserPage() {
             <button className="btn btn-secondary" onClick={openSaveModal}>
               Save Preset
             </button>
+            <label className="checkbox-option">
+              <input
+                type="checkbox"
+                checked={hideHeader}
+                onChange={(e) => setHideHeader(e.target.checked)}
+              />
+              Hide Header
+            </label>
             <button className="btn btn-danger btn-large" onClick={handleClear}>
               Clear Output
             </button>
