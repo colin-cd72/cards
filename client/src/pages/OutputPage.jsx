@@ -1,11 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useSocket } from '../contexts/SocketContext';
 import api from '../services/api';
 import './OutputPage.css';
-
-// Base dimensions for the card content (will be scaled to fill screen)
-const BASE_WIDTH = 800;
-const PADDING = 60;
 
 export default function OutputPage() {
   const { socket, connected } = useSocket();
@@ -13,68 +9,6 @@ export default function OutputPage() {
   const [isBlank, setIsBlank] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
   const [inverse, setInverse] = useState(false);
-  const [scale, setScale] = useState(1);
-
-  const containerRef = useRef(null);
-  const contentRef = useRef(null);
-
-  // Auto-scale content to fill the viewport
-  const calculateScale = useCallback(() => {
-    if (!containerRef.current || !contentRef.current || isBlank || !currentCard) {
-      setScale(1);
-      return;
-    }
-
-    // Reset scale first to get true content dimensions
-    setScale(1);
-
-    // Use requestAnimationFrame to ensure DOM has updated
-    requestAnimationFrame(() => {
-      if (!containerRef.current || !contentRef.current) return;
-
-      const container = containerRef.current;
-      const content = contentRef.current;
-
-      // Available space in viewport (with padding)
-      const availableWidth = container.clientWidth - (PADDING * 2);
-      const availableHeight = container.clientHeight - (PADDING * 2);
-
-      // Content's natural size at base width
-      const contentHeight = content.offsetHeight;
-
-      // Calculate scale to fill width
-      const scaleX = availableWidth / BASE_WIDTH;
-      // Calculate scale to fit height
-      const scaleY = availableHeight / contentHeight;
-
-      // Use the smaller scale to ensure content fits both dimensions
-      const newScale = Math.min(scaleX, scaleY);
-
-      if (newScale > 0 && isFinite(newScale)) {
-        setScale(newScale);
-      }
-    });
-  }, [isBlank, currentCard]);
-
-  // Recalculate on window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (currentCard && !isBlank) {
-        calculateScale();
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [calculateScale, currentCard, isBlank]);
-
-  // Recalculate when card changes
-  useEffect(() => {
-    if (currentCard && !isBlank) {
-      // Delay to ensure content is rendered
-      const timer = setTimeout(calculateScale, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [currentCard, isBlank, calculateScale]);
 
   useEffect(() => {
     // Load output settings
@@ -172,18 +106,10 @@ export default function OutputPage() {
   }
 
   return (
-    <div className={`output-page ${inverse ? 'inverse' : ''}`} ref={containerRef}>
+    <div className={`output-page ${inverse ? 'inverse' : ''}`}>
       <div className={`card-display ${transitioning ? 'transitioning' : ''} ${isBlank ? 'blank' : ''}`}>
         {!isBlank && currentCard && (
-          <div
-            className="card-content"
-            ref={contentRef}
-            style={{
-              width: `${BASE_WIDTH}px`,
-              transform: `scale(${scale})`,
-              transformOrigin: 'top left'
-            }}
-          >
+          <div className="card-content">
             {currentCard.badgeNumber && (
               <div className="card-badge">{currentCard.badgeNumber}</div>
             )}

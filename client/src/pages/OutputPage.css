@@ -32,6 +32,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  height: 100%;
 }
 
 .card-badge {
@@ -39,29 +41,29 @@
   top: 0;
   right: 0;
   background: #ffff00;
-  padding: 12px 24px;
-  font-size: 2rem;
+  padding: 1.5vh 3vw;
+  font-size: 4vw;
   font-weight: bold;
   border-radius: 6px;
 }
 
 .card-header {
-  font-size: 2.5rem;
+  font-size: 5vw;
   font-weight: bold;
   text-decoration: underline;
-  margin-bottom: 1.5rem;
-  padding-right: 150px;
+  margin-bottom: 2vh;
+  padding-right: 15vw;
   line-height: 1.3;
 }
 
 .card-body {
-  font-size: 2rem;
-  line-height: 1.5;
+  font-size: 4vw;
+  line-height: 1.4;
   flex: 1;
 }
 
 .card-body p {
-  margin-bottom: 1rem;
+  margin-bottom: 2vh;
 }
 
 .card-body strong, .card-body b {
