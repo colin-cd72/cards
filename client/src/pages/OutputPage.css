@@ -129,3 +129,30 @@
     right: 30px;
   }
 }
+
+/* Inverse Mode - White text on black background */
+.output-page.inverse {
+  background: #000000;
+}
+
+.output-page.inverse .card-display {
+  background: #000000;
+  color: #ffffff;
+}
+
+.output-page.inverse .card-display.blank {
+  background: #000000;
+}
+
+.output-page.inverse .card-badge {
+  background: #ffff00;
+  color: #000000;
+}
+
+.output-page.inverse .card-header {
+  color: #ffffff;
+}
+
+.output-page.inverse .card-body {
+  color: #ffffff;
+}

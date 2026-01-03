@@ -4,11 +4,12 @@ const settingsController = require('../controllers/settingsController');
 const { requireAdmin } = require('../middleware/auth');
 const { validate } = require('../utils/validators');
 
-// All routes require admin access
-router.use(requireAdmin);
+// Public route for output settings (no auth required)
+router.get('/public/output', settingsController.getOutputSettings);
 
-router.get('/', settingsController.list);
-router.get('/:key', settingsController.get);
-router.put('/:key', validate('setting'), settingsController.update);
+// Admin routes
+router.get('/', requireAdmin, settingsController.list);
+router.get('/:key', requireAdmin, settingsController.get);
+router.put('/:key', requireAdmin, validate('setting'), settingsController.update);
 
 module.exports = router;

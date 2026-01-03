@@ -23,6 +23,19 @@ const settingsController = {
     }
   },
 
+  // Public endpoint for output page settings
+  getOutputSettings(req, res, next) {
+    try {
+      const outputSettings = Setting.getValue('output_settings', {
+        inverse: false,
+        blankOnStartup: true
+      });
+      res.json({ settings: outputSettings });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   update(req, res, next) {
     try {
       const { key } = req.params;
@@ -32,6 +45,13 @@ const settingsController = {
       const setting = Setting.findByKey(key);
 
       logger.info(`Setting updated: ${key} by admin ${req.session.username}`);
+
+      // Broadcast settings change to output pages
+      if (key === 'output_settings' && req.app.get('io')) {
+        req.app.get('io').to('outputs').emit('settings:update', {
+          settings: setting_value
+        });
+      }
 
       res.json({ setting });
     } catch (error) {

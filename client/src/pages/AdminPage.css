@@ -27,6 +27,47 @@
 .admin-content {
   flex: 1;
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Settings Panel */
+.settings-panel {
+  margin-bottom: 0;
+}
+
+.settings-form {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.toggle-setting {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.toggle-setting input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.toggle-label {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle-label strong {
+  font-size: 0.95rem;
+}
+
+.toggle-label small {
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .panel-header {

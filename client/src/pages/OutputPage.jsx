@@ -8,8 +8,12 @@ export default function OutputPage() {
   const [currentCard, setCurrentCard] = useState(null);
   const [isBlank, setIsBlank] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
+  const [inverse, setInverse] = useState(false);
 
   useEffect(() => {
+    // Load output settings
+    loadSettings();
+
     // Join output room
     if (socket && connected) {
       socket.emit('output:join');
@@ -21,15 +25,28 @@ export default function OutputPage() {
       socket.on('card:display', handleCardDisplay);
       socket.on('card:blank', handleCardBlank);
       socket.on('card:current', handleCurrentCard);
+      socket.on('settings:update', handleSettingsUpdate);
 
       return () => {
         socket.emit('output:leave');
         socket.off('card:display', handleCardDisplay);
         socket.off('card:blank', handleCardBlank);
         socket.off('card:current', handleCurrentCard);
+        socket.off('settings:update', handleSettingsUpdate);
       };
     }
   }, [socket, connected]);
+
+  async function loadSettings() {
+    try {
+      const response = await api.get('/settings/public/output');
+      if (response.data.settings) {
+        setInverse(response.data.settings.inverse || false);
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+  }
 
   async function loadCurrentCard() {
     try {
@@ -82,8 +99,14 @@ export default function OutputPage() {
     }
   }
 
+  function handleSettingsUpdate(data) {
+    if (data.settings) {
+      setInverse(data.settings.inverse || false);
+    }
+  }
+
   return (
-    <div className="output-page">
+    <div className={`output-page ${inverse ? 'inverse' : ''}`}>
       <div className={`card-display ${transitioning ? 'transitioning' : ''} ${isBlank ? 'blank' : ''}`}>
         {!isBlank && currentCard && (
           <>

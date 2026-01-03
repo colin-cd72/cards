@@ -20,8 +20,16 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  // Output settings state
+  const [outputSettings, setOutputSettings] = useState({
+    inverse: false,
+    blankOnStartup: true
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+
   useEffect(() => {
     loadUsers();
+    loadOutputSettings();
   }, []);
 
   async function loadUsers() {
@@ -32,6 +40,33 @@ export default function AdminPage() {
       console.error('Failed to load users:', err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadOutputSettings() {
+    try {
+      const response = await api.get('/settings/output_settings');
+      if (response.data.setting?.setting_value) {
+        const value = typeof response.data.setting.setting_value === 'string'
+          ? JSON.parse(response.data.setting.setting_value)
+          : response.data.setting.setting_value;
+        setOutputSettings(value);
+      }
+    } catch (err) {
+      console.error('Failed to load output settings:', err);
+    }
+  }
+
+  async function handleSaveOutputSettings() {
+    setSavingSettings(true);
+    try {
+      await api.put('/settings/output_settings', {
+        setting_value: outputSettings
+      });
+    } catch (err) {
+      alert('Failed to save settings: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setSavingSettings(false);
     }
   }
 
@@ -154,6 +189,34 @@ export default function AdminPage() {
       </header>
 
       <main className="admin-content">
+        {/* Output Settings Panel */}
+        <div className="panel settings-panel">
+          <div className="panel-header">
+            <h2>Output Display Settings</h2>
+          </div>
+          <div className="settings-form">
+            <label className="toggle-setting">
+              <input
+                type="checkbox"
+                checked={outputSettings.inverse}
+                onChange={(e) => setOutputSettings({ ...outputSettings, inverse: e.target.checked })}
+              />
+              <span className="toggle-label">
+                <strong>Inverse Mode</strong>
+                <small>White text on black background</small>
+              </span>
+            </label>
+            <button
+              className="btn btn-primary"
+              onClick={handleSaveOutputSettings}
+              disabled={savingSettings}
+            >
+              {savingSettings ? 'Saving...' : 'Save Settings'}
+            </button>
+          </div>
+        </div>
+
+        {/* User Management Panel */}
         <div className="panel">
           <div className="panel-header">
             <h2>User Management</h2>
