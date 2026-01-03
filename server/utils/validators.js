@@ -39,7 +39,8 @@ const schemas = {
     body_content: Joi.object().required(),
     body_html: Joi.string().required(),
     badge_number: Joi.string().max(10).allow('', null),
-    preset_id: Joi.number().integer().allow(null)
+    preset_id: Joi.number().integer().allow(null),
+    hide_header: Joi.boolean().default(false)
   }),
 
   setting: Joi.object({
