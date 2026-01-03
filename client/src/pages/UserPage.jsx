@@ -34,7 +34,7 @@ export default function UserPage() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [presetNumber, setPresetNumber] = useState('');
   const [presetSubject, setPresetSubject] = useState('');
-  const [hideHeader, setHideHeader] = useState(false);
+  const [hideHeader, setHideHeader] = useState(true);
 
   const quillRef = useRef(null);
 
@@ -162,8 +162,8 @@ export default function UserPage() {
   }
 
   function openSaveModal() {
-    setPresetNumber(selectedPreset?.preset_number?.toString() || '');
-    setPresetSubject(selectedPreset?.subject || '');
+    setPresetNumber(selectedPreset?.preset_number?.toString() || badgeNumber || '');
+    setPresetSubject(selectedPreset?.subject || headerText || '');
     setShowSaveModal(true);
   }
 
