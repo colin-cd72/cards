@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSocket } from '../contexts/SocketContext';
 import api from '../services/api';
 import './OutputPage.css';
@@ -9,6 +9,29 @@ export default function OutputPage() {
   const [isBlank, setIsBlank] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
   const [inverse, setInverse] = useState(false);
+
+  // Toggle fullscreen mode
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.error('Fullscreen error:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }, []);
+
+  // Handle keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Press 'F' to toggle fullscreen
+      if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [toggleFullscreen]);
 
   useEffect(() => {
     // Load output settings
@@ -106,7 +129,7 @@ export default function OutputPage() {
   }
 
   return (
-    <div className={`output-page ${inverse ? 'inverse' : ''}`}>
+    <div className={`output-page ${inverse ? 'inverse' : ''}`} onClick={toggleFullscreen}>
       <div className={`card-display ${transitioning ? 'transitioning' : ''} ${isBlank ? 'blank' : ''}`}>
         {!isBlank && currentCard && (
           <div className="card-content">
