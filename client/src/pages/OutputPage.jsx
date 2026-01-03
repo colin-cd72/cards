@@ -5,7 +5,7 @@ import './OutputPage.css';
 
 // Base dimensions for the card content (will be scaled to fill screen)
 const BASE_WIDTH = 800;
-const BASE_PADDING = 60;
+const PADDING = 60;
 
 export default function OutputPage() {
   const { socket, connected } = useSocket();
@@ -20,44 +20,59 @@ export default function OutputPage() {
 
   // Auto-scale content to fill the viewport
   const calculateScale = useCallback(() => {
-    if (!containerRef.current || !contentRef.current || isBlank) {
+    if (!containerRef.current || !contentRef.current || isBlank || !currentCard) {
       setScale(1);
       return;
     }
 
-    const container = containerRef.current;
-    const content = contentRef.current;
+    // Reset scale first to get true content dimensions
+    setScale(1);
 
-    // Available space in viewport (with padding)
-    const availableWidth = container.clientWidth - (BASE_PADDING * 2);
-    const availableHeight = container.clientHeight - (BASE_PADDING * 2);
+    // Use requestAnimationFrame to ensure DOM has updated
+    requestAnimationFrame(() => {
+      if (!containerRef.current || !contentRef.current) return;
 
-    // Content's natural size at base width
-    const contentHeight = content.scrollHeight;
+      const container = containerRef.current;
+      const content = contentRef.current;
 
-    // Calculate scale to fill width
-    const scaleX = availableWidth / BASE_WIDTH;
-    // Calculate scale to fit height
-    const scaleY = availableHeight / contentHeight;
+      // Available space in viewport (with padding)
+      const availableWidth = container.clientWidth - (PADDING * 2);
+      const availableHeight = container.clientHeight - (PADDING * 2);
 
-    // Use the smaller scale to ensure content fits both dimensions
-    const newScale = Math.min(scaleX, scaleY);
+      // Content's natural size at base width
+      const contentHeight = content.offsetHeight;
 
-    setScale(newScale > 0 ? newScale : 1);
-  }, [isBlank]);
+      // Calculate scale to fill width
+      const scaleX = availableWidth / BASE_WIDTH;
+      // Calculate scale to fit height
+      const scaleY = availableHeight / contentHeight;
+
+      // Use the smaller scale to ensure content fits both dimensions
+      const newScale = Math.min(scaleX, scaleY);
+
+      if (newScale > 0 && isFinite(newScale)) {
+        setScale(newScale);
+      }
+    });
+  }, [isBlank, currentCard]);
 
   // Recalculate on window resize
   useEffect(() => {
-    const handleResize = () => calculateScale();
+    const handleResize = () => {
+      if (currentCard && !isBlank) {
+        calculateScale();
+      }
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [calculateScale]);
+  }, [calculateScale, currentCard, isBlank]);
 
   // Recalculate when card changes
   useEffect(() => {
     if (currentCard && !isBlank) {
-      // Small delay to ensure content is rendered
-      setTimeout(calculateScale, 50);
+      // Delay to ensure content is rendered
+      const timer = setTimeout(calculateScale, 100);
+      return () => clearTimeout(timer);
     }
   }, [currentCard, isBlank, calculateScale]);
 
