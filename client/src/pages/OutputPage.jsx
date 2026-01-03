@@ -3,6 +3,10 @@ import { useSocket } from '../contexts/SocketContext';
 import api from '../services/api';
 import './OutputPage.css';
 
+// Base dimensions for the card content (will be scaled to fill screen)
+const BASE_WIDTH = 800;
+const BASE_PADDING = 60;
+
 export default function OutputPage() {
   const { socket, connected } = useSocket();
   const [currentCard, setCurrentCard] = useState(null);
@@ -14,36 +18,30 @@ export default function OutputPage() {
   const containerRef = useRef(null);
   const contentRef = useRef(null);
 
-  // Auto-scale text to fit container
+  // Auto-scale content to fill the viewport
   const calculateScale = useCallback(() => {
     if (!containerRef.current || !contentRef.current || isBlank) {
       setScale(1);
       return;
     }
 
-    // Reset scale to measure natural size
-    contentRef.current.style.transform = 'scale(1)';
-
     const container = containerRef.current;
     const content = contentRef.current;
 
-    const containerWidth = container.clientWidth - 120; // padding
-    const containerHeight = container.clientHeight - 120;
+    // Available space in viewport (with padding)
+    const availableWidth = container.clientWidth - (BASE_PADDING * 2);
+    const availableHeight = container.clientHeight - (BASE_PADDING * 2);
 
-    const contentWidth = content.scrollWidth;
+    // Content's natural size at base width
     const contentHeight = content.scrollHeight;
 
-    if (contentWidth === 0 || contentHeight === 0) {
-      setScale(1);
-      return;
-    }
-
-    const scaleX = containerWidth / contentWidth;
-    const scaleY = containerHeight / contentHeight;
+    // Calculate scale to fill width
+    const scaleX = availableWidth / BASE_WIDTH;
+    // Calculate scale to fit height
+    const scaleY = availableHeight / contentHeight;
 
     // Use the smaller scale to ensure content fits both dimensions
-    // Cap at 2x to prevent overly large text for short content
-    const newScale = Math.min(scaleX, scaleY, 2);
+    const newScale = Math.min(scaleX, scaleY);
 
     setScale(newScale > 0 ? newScale : 1);
   }, [isBlank]);
@@ -165,7 +163,11 @@ export default function OutputPage() {
           <div
             className="card-content"
             ref={contentRef}
-            style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+            style={{
+              width: `${BASE_WIDTH}px`,
+              transform: `scale(${scale})`,
+              transformOrigin: 'top left'
+            }}
           >
             {currentCard.badgeNumber && (
               <div className="card-badge">{currentCard.badgeNumber}</div>
