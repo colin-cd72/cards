@@ -11,13 +11,13 @@
   width: 100%;
   height: 100%;
   background: #ffffff;
-  padding: 60px 80px;
+  padding: 60px;
   position: relative;
   font-family: Georgia, serif;
   transition: opacity 0.15s ease-in-out;
   display: flex;
-  flex-direction: column;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .card-display.transitioning {
@@ -28,34 +28,41 @@
   opacity: 0;
 }
 
+.card-content {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .card-badge {
   position: absolute;
-  top: 40px;
-  right: 60px;
+  top: 0;
+  right: 0;
   background: #ffff00;
-  padding: 15px 30px;
-  font-size: 3rem;
+  padding: 12px 24px;
+  font-size: 2rem;
   font-weight: bold;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .card-header {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: bold;
   text-decoration: underline;
-  margin-bottom: 2rem;
-  padding-right: 200px;
+  margin-bottom: 1.5rem;
+  padding-right: 150px;
   line-height: 1.3;
 }
 
 .card-body {
-  font-size: 2.25rem;
-  line-height: 1.6;
+  font-size: 2rem;
+  line-height: 1.5;
   flex: 1;
 }
 
 .card-body p {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
 }
 
 .card-body strong, .card-body b {
@@ -89,45 +96,6 @@
   background: #dc2626;
   color: white;
   opacity: 1;
-}
-
-/* Responsive scaling for smaller screens */
-@media (max-width: 1400px) {
-  .card-display {
-    padding: 50px 60px;
-  }
-  .card-header {
-    font-size: 2.5rem;
-    padding-right: 160px;
-  }
-  .card-body {
-    font-size: 1.85rem;
-  }
-  .card-badge {
-    font-size: 2.5rem;
-    padding: 12px 24px;
-    top: 30px;
-    right: 40px;
-  }
-}
-
-@media (max-width: 1000px) {
-  .card-display {
-    padding: 40px 50px;
-  }
-  .card-header {
-    font-size: 2rem;
-    padding-right: 120px;
-  }
-  .card-body {
-    font-size: 1.5rem;
-  }
-  .card-badge {
-    font-size: 2rem;
-    padding: 10px 20px;
-    top: 25px;
-    right: 30px;
-  }
 }
 
 /* Inverse Mode - White text on black background */

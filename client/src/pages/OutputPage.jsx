@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSocket } from '../contexts/SocketContext';
 import api from '../services/api';
 import './OutputPage.css';
@@ -9,6 +9,59 @@ export default function OutputPage() {
   const [isBlank, setIsBlank] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
   const [inverse, setInverse] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  const containerRef = useRef(null);
+  const contentRef = useRef(null);
+
+  // Auto-scale text to fit container
+  const calculateScale = useCallback(() => {
+    if (!containerRef.current || !contentRef.current || isBlank) {
+      setScale(1);
+      return;
+    }
+
+    // Reset scale to measure natural size
+    contentRef.current.style.transform = 'scale(1)';
+
+    const container = containerRef.current;
+    const content = contentRef.current;
+
+    const containerWidth = container.clientWidth - 120; // padding
+    const containerHeight = container.clientHeight - 120;
+
+    const contentWidth = content.scrollWidth;
+    const contentHeight = content.scrollHeight;
+
+    if (contentWidth === 0 || contentHeight === 0) {
+      setScale(1);
+      return;
+    }
+
+    const scaleX = containerWidth / contentWidth;
+    const scaleY = containerHeight / contentHeight;
+
+    // Use the smaller scale to ensure content fits both dimensions
+    // Cap at 2x to prevent overly large text for short content
+    const newScale = Math.min(scaleX, scaleY, 2);
+
+    setScale(newScale > 0 ? newScale : 1);
+  }, [isBlank]);
+
+  // Recalculate on window resize
+  useEffect(() => {
+    const handleResize = () => calculateScale();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [calculateScale]);
+
+  // Recalculate when card changes
+  useEffect(() => {
+    if (currentCard && !isBlank) {
+      // Small delay to ensure content is rendered
+      setTimeout(calculateScale, 50);
+    }
+  }, [currentCard, isBlank, calculateScale]);
 
   useEffect(() => {
     // Load output settings
@@ -106,10 +159,14 @@ export default function OutputPage() {
   }
 
   return (
-    <div className={`output-page ${inverse ? 'inverse' : ''}`}>
+    <div className={`output-page ${inverse ? 'inverse' : ''}`} ref={containerRef}>
       <div className={`card-display ${transitioning ? 'transitioning' : ''} ${isBlank ? 'blank' : ''}`}>
         {!isBlank && currentCard && (
-          <>
+          <div
+            className="card-content"
+            ref={contentRef}
+            style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
+          >
             {currentCard.badgeNumber && (
               <div className="card-badge">{currentCard.badgeNumber}</div>
             )}
@@ -118,7 +175,7 @@ export default function OutputPage() {
               className="card-body"
               dangerouslySetInnerHTML={{ __html: currentCard.bodyHtml }}
             />
-          </>
+          </div>
         )}
       </div>
 
