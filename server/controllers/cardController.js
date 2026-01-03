@@ -36,7 +36,7 @@ const cardController = {
     currentCard = null;
   },
 
-  async send(req, res, next) {
+  send(req, res, next) {
     try {
       const data = {
         ...req.validatedBody,
@@ -44,8 +44,8 @@ const cardController = {
         body_html: sanitizeHtml(req.validatedBody.body_html, sanitizeOptions)
       };
 
-      const id = await Card.create(data);
-      const card = await Card.findById(id);
+      const id = Card.create(data);
+      const card = Card.findById(id);
 
       // Update current card
       currentCard = card;
@@ -73,7 +73,7 @@ const cardController = {
     }
   },
 
-  async clear(req, res, next) {
+  clear(req, res, next) {
     try {
       // Clear current card
       currentCard = null;
@@ -91,7 +91,7 @@ const cardController = {
     }
   },
 
-  async current(req, res, next) {
+  current(req, res, next) {
     try {
       res.json({ card: currentCard });
     } catch (error) {
@@ -99,12 +99,12 @@ const cardController = {
     }
   },
 
-  async history(req, res, next) {
+  history(req, res, next) {
     try {
       const limit = parseInt(req.query.limit) || 50;
       const offset = parseInt(req.query.offset) || 0;
 
-      const cards = await Card.getHistory(limit, offset);
+      const cards = Card.getHistory(limit, offset);
       res.json({ cards });
     } catch (error) {
       next(error);

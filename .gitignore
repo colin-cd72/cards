@@ -15,6 +15,12 @@ npm-debug.log*
 # Build output
 client/dist/
 
+# Database
+data/
+*.db
+*.db-wal
+*.db-shm
+
 # IDE
 .vscode/
 .idea/

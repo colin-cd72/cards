@@ -2,18 +2,18 @@ const User = require('../models/User');
 const logger = require('../utils/logger');
 
 const userController = {
-  async list(req, res, next) {
+  list(req, res, next) {
     try {
-      const users = await User.findAll();
+      const users = User.findAll();
       res.json({ users });
     } catch (error) {
       next(error);
     }
   },
 
-  async get(req, res, next) {
+  get(req, res, next) {
     try {
-      const user = await User.findById(req.params.id);
+      const user = User.findById(req.params.id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -23,12 +23,12 @@ const userController = {
     }
   },
 
-  async create(req, res, next) {
+  create(req, res, next) {
     try {
       const { username, email, password, role } = req.validatedBody;
 
-      const id = await User.create({ username, email, password, role });
-      const user = await User.findById(id);
+      const id = User.create({ username, email, password, role });
+      const user = User.findById(id);
 
       logger.info(`User created: ${username} by admin ${req.session.username}`);
 
@@ -38,17 +38,17 @@ const userController = {
     }
   },
 
-  async update(req, res, next) {
+  update(req, res, next) {
     try {
       const { id } = req.params;
 
-      const existingUser = await User.findById(id);
+      const existingUser = User.findById(id);
       if (!existingUser) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      await User.update(id, req.validatedBody);
-      const user = await User.findById(id);
+      User.update(id, req.validatedBody);
+      const user = User.findById(id);
 
       logger.info(`User updated: ${user.username} by admin ${req.session.username}`);
 
@@ -58,17 +58,17 @@ const userController = {
     }
   },
 
-  async changePassword(req, res, next) {
+  changePassword(req, res, next) {
     try {
       const { id } = req.params;
       const { password } = req.validatedBody;
 
-      const existingUser = await User.findById(id);
+      const existingUser = User.findById(id);
       if (!existingUser) {
         return res.status(404).json({ error: 'User not found' });
       }
 
-      await User.updatePassword(id, password);
+      User.updatePassword(id, password);
 
       logger.info(`Password changed for: ${existingUser.username} by admin ${req.session.username}`);
 
@@ -78,11 +78,11 @@ const userController = {
     }
   },
 
-  async delete(req, res, next) {
+  delete(req, res, next) {
     try {
       const { id } = req.params;
 
-      const existingUser = await User.findById(id);
+      const existingUser = User.findById(id);
       if (!existingUser) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -92,7 +92,7 @@ const userController = {
         return res.status(400).json({ error: 'Cannot delete your own account' });
       }
 
-      await User.delete(id);
+      User.delete(id);
 
       logger.info(`User deleted: ${existingUser.username} by admin ${req.session.username}`);
 

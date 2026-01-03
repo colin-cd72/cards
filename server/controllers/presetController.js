@@ -21,27 +21,27 @@ const sanitizeOptions = {
 };
 
 const presetController = {
-  async list(req, res, next) {
+  list(req, res, next) {
     try {
-      const presets = await Preset.findByUserId(req.session.userId);
+      const presets = Preset.findByUserId(req.session.userId);
       res.json({ presets });
     } catch (error) {
       next(error);
     }
   },
 
-  async listGlobal(req, res, next) {
+  listGlobal(req, res, next) {
     try {
-      const presets = await Preset.findGlobal();
+      const presets = Preset.findGlobal();
       res.json({ presets });
     } catch (error) {
       next(error);
     }
   },
 
-  async get(req, res, next) {
+  get(req, res, next) {
     try {
-      const preset = await Preset.findById(req.params.id);
+      const preset = Preset.findById(req.params.id);
       if (!preset) {
         return res.status(404).json({ error: 'Preset not found' });
       }
@@ -57,9 +57,9 @@ const presetController = {
     }
   },
 
-  async getByNumber(req, res, next) {
+  getByNumber(req, res, next) {
     try {
-      const preset = await Preset.findByNumber(req.session.userId, req.params.number);
+      const preset = Preset.findByNumber(req.session.userId, req.params.number);
       if (!preset) {
         return res.status(404).json({ error: 'Preset not found' });
       }
@@ -69,21 +69,21 @@ const presetController = {
     }
   },
 
-  async search(req, res, next) {
+  search(req, res, next) {
     try {
       const { q } = req.query;
       if (!q) {
         return res.status(400).json({ error: 'Search query required' });
       }
 
-      const presets = await Preset.search(req.session.userId, q);
+      const presets = Preset.search(req.session.userId, q);
       res.json({ presets });
     } catch (error) {
       next(error);
     }
   },
 
-  async create(req, res, next) {
+  create(req, res, next) {
     try {
       const data = {
         ...req.validatedBody,
@@ -96,8 +96,8 @@ const presetController = {
         data.is_global = false;
       }
 
-      const id = await Preset.create(data);
-      const preset = await Preset.findById(id);
+      const id = Preset.create(data);
+      const preset = Preset.findById(id);
 
       logger.info(`Preset created: #${preset.preset_number} by ${req.session.username}`);
 
@@ -107,11 +107,11 @@ const presetController = {
     }
   },
 
-  async update(req, res, next) {
+  update(req, res, next) {
     try {
       const { id } = req.params;
 
-      const existingPreset = await Preset.findById(id);
+      const existingPreset = Preset.findById(id);
       if (!existingPreset) {
         return res.status(404).json({ error: 'Preset not found' });
       }
@@ -131,8 +131,8 @@ const presetController = {
         delete data.is_global;
       }
 
-      await Preset.update(id, data);
-      const preset = await Preset.findById(id);
+      Preset.update(id, data);
+      const preset = Preset.findById(id);
 
       logger.info(`Preset updated: #${preset.preset_number} by ${req.session.username}`);
 
@@ -142,11 +142,11 @@ const presetController = {
     }
   },
 
-  async delete(req, res, next) {
+  delete(req, res, next) {
     try {
       const { id } = req.params;
 
-      const existingPreset = await Preset.findById(id);
+      const existingPreset = Preset.findById(id);
       if (!existingPreset) {
         return res.status(404).json({ error: 'Preset not found' });
       }
@@ -156,7 +156,7 @@ const presetController = {
         return res.status(403).json({ error: 'Access denied' });
       }
 
-      await Preset.delete(id);
+      Preset.delete(id);
 
       logger.info(`Preset deleted: #${existingPreset.preset_number} by ${req.session.username}`);
 

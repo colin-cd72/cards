@@ -2,11 +2,11 @@ const User = require('../models/User');
 const logger = require('../utils/logger');
 
 const authController = {
-  async login(req, res, next) {
+  login(req, res, next) {
     try {
       const { username, password } = req.validatedBody;
 
-      const user = await User.findByUsername(username);
+      const user = User.findByUsername(username);
       if (!user) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
@@ -15,13 +15,13 @@ const authController = {
         return res.status(401).json({ error: 'Account is deactivated' });
       }
 
-      const validPassword = await User.verifyPassword(user, password);
+      const validPassword = User.verifyPassword(user, password);
       if (!validPassword) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
       // Update last login
-      await User.updateLastLogin(user.id);
+      User.updateLastLogin(user.id);
 
       // Set session
       req.session.userId = user.id;
@@ -44,7 +44,7 @@ const authController = {
     }
   },
 
-  async logout(req, res, next) {
+  logout(req, res, next) {
     try {
       const username = req.session.username;
 
@@ -62,11 +62,11 @@ const authController = {
     }
   },
 
-  async me(req, res, next) {
+  me(req, res, next) {
     try {
-      const user = await User.findById(req.session.userId);
+      const user = User.findById(req.session.userId);
       if (!user) {
-        req.session.destroy();
+        req.session.destroy(() => {});
         return res.status(401).json({ error: 'User not found' });
       }
 
